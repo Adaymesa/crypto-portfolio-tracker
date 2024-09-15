@@ -55,4 +55,19 @@ describe('EditCryptoForm', () => {
     expect(screen.getByDisplayValue('ETH')).toBeInTheDocument();
     expect(screen.getByDisplayValue('2')).toBeInTheDocument();
   });
+
+  it('displays error message for invalid input', () => {
+    render(<EditCryptoForm crypto={mockCrypto} onSave={mockOnSave} onCancel={mockOnCancel} />);
+    
+    fireEvent.change(screen.getByDisplayValue('Bitcoin'), { target: { value: '' } });
+    fireEvent.change(screen.getByDisplayValue('BTC'), { target: { value: '' } });
+    fireEvent.change(screen.getByDisplayValue('1'), { target: { value: '-1' } });
+    
+    fireEvent.submit(screen.getByLabelText('Edit Cryptocurrency Form'));
+    
+    expect(screen.getByText(/Name is required/i)).toBeInTheDocument();
+    expect(screen.getByText(/Symbol is required/i)).toBeInTheDocument();
+    expect(screen.getByText(/Quantity must be a positive number/i)).toBeInTheDocument();
+    expect(mockOnSave).not.toHaveBeenCalled();
+  });
 });
