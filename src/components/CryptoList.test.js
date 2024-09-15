@@ -15,7 +15,12 @@ describe('CryptoList', () => {
       { id: 2, name: 'Ethereum', symbol: 'ETH', quantity: 10, price: 3000 },
     ];
     render(<CryptoList cryptos={cryptos} />);
-    expect(screen.getByText('Bitcoin (BTC)')).toBeInTheDocument();
-    expect(screen.getByText('Ethereum (ETH)')).toBeInTheDocument();
+    expect(screen.getByText(/Bitcoin \(BTC\)/)).toBeInTheDocument();
+    expect(screen.getByText(/Ethereum \(ETH\)/)).toBeInTheDocument();
+  });
+
+  it('displays a message when there are no cryptocurrencies', () => {
+    render(<CryptoList cryptos={[]} />);
+    expect(screen.getByText('No cryptocurrencies in the portfolio.')).toBeInTheDocument();
   });
 });
