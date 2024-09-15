@@ -34,4 +34,14 @@ describe('CryptoList', () => {
     
     expect(mockOnDelete).toHaveBeenCalledWith(1);
   });
+
+  it('calls onEdit when edit button is clicked', () => {
+    const mockOnEdit = jest.fn();
+    render(<CryptoList cryptos={mockCryptos} onDelete={jest.fn()} onEdit={mockOnEdit} />);
+    
+    const editButtons = screen.getAllByText('Edit');
+    fireEvent.click(editButtons[0]);
+    
+    expect(mockOnEdit).toHaveBeenCalledWith(mockCryptos[0]);
+  });
 });
