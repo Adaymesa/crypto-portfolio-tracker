@@ -1,6 +1,6 @@
 import React from 'react';
 
-const CryptoList = ({ cryptos = [] }) => {
+const CryptoList = ({ cryptos = [], onDelete }) => {
   return (
     <div>
       <h1>Crypto Portfolio</h1>
@@ -12,6 +12,7 @@ const CryptoList = ({ cryptos = [] }) => {
               <p>Quantity: {crypto.quantity}</p>
               <p>Price: ${crypto.price}</p>
               <p>Total Value: ${crypto.quantity * crypto.price}</p>
+              <button onClick={() => onDelete(crypto.id)}>Delete</button>
             </li>
           ))}
         </ul>

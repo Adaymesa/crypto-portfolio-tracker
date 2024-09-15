@@ -12,9 +12,13 @@ function App() {
     setCryptos([...cryptos, { ...newCrypto, id: Date.now(), price: 0 }]);
   };
 
+  const handleDeleteCrypto = (id) => {
+    setCryptos(cryptos.filter(crypto => crypto.id !== id));
+  };
+
   return (
     <div className="App">
-      <CryptoList cryptos={cryptos} />
+      <CryptoList cryptos={cryptos} onDelete={handleDeleteCrypto} />
       <AddCryptoForm onAddCrypto={handleAddCrypto} />
     </div>
   );
