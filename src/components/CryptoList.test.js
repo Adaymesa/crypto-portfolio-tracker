@@ -11,7 +11,7 @@ describe('CryptoList', () => {
 
   it('renders the component title', () => {
     render(<CryptoList cryptos={[]} />);
-    expect(screen.getByText('Crypto Portfolio')).toBeInTheDocument();
+    expect(screen.getByText('Your Cryptocurrencies')).toBeInTheDocument();
   });
 
   it('displays a list of cryptocurrencies', () => {

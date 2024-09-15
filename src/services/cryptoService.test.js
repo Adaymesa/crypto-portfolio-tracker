@@ -1,15 +1,19 @@
-import axios from 'axios';
-import { fetchCryptoPrices } from './cryptoService';
+const axios = require('axios');
+const { fetchCryptoPrices } = require('./cryptoService');
 
 jest.mock('axios');
 
 describe('cryptoService', () => {
+  beforeEach(() => {
+    jest.resetAllMocks();
+  });
+
   it('fetches crypto prices successfully', async () => {
     const mockData = {
       bitcoin: { usd: 50000 },
       ethereum: { usd: 3000 }
     };
-    axios.get.mockResolvedValue({ data: mockData });
+    axios.get = jest.fn().mockResolvedValue({ data: mockData });
 
     const result = await fetchCryptoPrices(['bitcoin', 'ethereum']);
     expect(result).toEqual(mockData);
@@ -26,8 +30,14 @@ describe('cryptoService', () => {
 
   it('handles errors when fetching crypto prices', async () => {
     const mockError = new Error('API error');
-    axios.get.mockRejectedValue(mockError);
+    axios.get = jest.fn().mockRejectedValue(mockError);
+
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
 
     await expect(fetchCryptoPrices(['bitcoin', 'ethereum'])).rejects.toThrow('API error');
+
+    expect(consoleSpy).toHaveBeenCalledWith('Error fetching crypto prices:', mockError);
+
+    consoleSpy.mockRestore();
   });
 });
