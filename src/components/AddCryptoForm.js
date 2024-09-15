@@ -4,40 +4,53 @@ const AddCryptoForm = ({ onAddCrypto }) => {
   const [name, setName] = useState('');
   const [symbol, setSymbol] = useState('');
   const [quantity, setQuantity] = useState('');
+  const [errors, setErrors] = useState({});
+
+  const validateForm = () => {
+    const newErrors = {};
+    if (!name.trim()) newErrors.name = 'Name is required';
+    if (!symbol.trim()) newErrors.symbol = 'Symbol is required';
+    if (!quantity || parseFloat(quantity) <= 0) newErrors.quantity = 'Quantity must be a positive number';
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onAddCrypto({
-      name,
-      symbol,
-      quantity: parseFloat(quantity)
-    });
-    setName('');
-    setSymbol('');
-    setQuantity('');
+    if (validateForm()) {
+      onAddCrypto({
+        name,
+        symbol,
+        quantity: parseFloat(quantity)
+      });
+      setName('');
+      setSymbol('');
+      setQuantity('');
+      setErrors({});
+    }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} aria-label="Add Cryptocurrency Form">
       <div>
         <label htmlFor="name">Name:</label>
         <input
           id="name"
-          type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
           required
         />
+        {errors.name && <span>{errors.name}</span>}
       </div>
       <div>
         <label htmlFor="symbol">Symbol:</label>
         <input
           id="symbol"
-          type="text"
           value={symbol}
           onChange={(e) => setSymbol(e.target.value)}
           required
         />
+        {errors.symbol && <span>{errors.symbol}</span>}
       </div>
       <div>
         <label htmlFor="quantity">Quantity:</label>
@@ -50,6 +63,7 @@ const AddCryptoForm = ({ onAddCrypto }) => {
           min="0"
           step="any"
         />
+        {errors.quantity && <span>{errors.quantity}</span>}
       </div>
       <button type="submit">Add Cryptocurrency</button>
     </form>
