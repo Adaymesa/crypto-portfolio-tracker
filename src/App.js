@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import CryptoList from './components/CryptoList';
 import AddCryptoForm from './components/AddCryptoForm';
+import useLocalStorage from './hooks/useLocalStorage';
 
 function App() {
-  const [cryptos, setCryptos] = useState([
+  const [cryptos, setCryptos] = useLocalStorage('cryptos', [
     { id: 1, name: 'Bitcoin', symbol: 'BTC', quantity: 1, price: 50000 },
     { id: 2, name: 'Ethereum', symbol: 'ETH', quantity: 10, price: 3000 },
   ]);
