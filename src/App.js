@@ -1,129 +1,22 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import CryptoList from './components/CryptoList';
-import AddCryptoForm from './components/AddCryptoForm';
-import EditCryptoForm from './components/EditCryptoForm';
-import useLocalStorage from './hooks/useLocalStorage';
-import { fetchCryptoPrices, fetchCoinsList } from './services/cryptoService';
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import HomeScreen from './screens/HomeScreen';
+import AddEditHoldingScreen from './screens/AddEditHoldingScreen';
+import DetailsScreen from './screens/DetailsScreen';
 
 function App() {
-  const [cryptos, setCryptos] = useLocalStorage('cryptos', []);
-  const [coinsList, setCoinsList] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [editingCrypto, setEditingCrypto] = useState(null);
-
-  const fetchCoins = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const coins = await fetchCoinsList();
-      setCoinsList(coins);
-    } catch (error) {
-      console.error('Failed to fetch coins list:', error);
-      setError('Failed to fetch coins list. Please try again later.');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  const updatePrices = useCallback(async () => {
-    if (!cryptos.length || !coinsList.length) return;
-    try {
-      setLoading(true);
-      setError(null);
-
-      const newPrices = await fetchCryptoPrices(cryptos);
-
-      setCryptos(prevCryptos => prevCryptos.map((crypto) => {
-        const newPrice = newPrices[crypto.id]?.usd || crypto.price || 0;
-        return {
-          ...crypto,
-          price: newPrice,
-          total: crypto.quantity * newPrice
-        };
-      }));
-    } catch (error) {
-      console.error('Failed to fetch crypto prices:', error);
-      setError('Failed to fetch crypto prices. Please try again later.');
-    } finally {
-      setLoading(false);
-    }
-  }, [cryptos, coinsList]);
-
-  useEffect(() => {
-    fetchCoins();
-  }, [fetchCoins]);
-
-  useEffect(() => {
-    if (cryptos.length && coinsList.length) {
-      updatePrices();
-    }
-  }, [coinsList]); 
-
-  const handleAddCrypto = (newCrypto) => {
-    const coinInfo = coinsList.find(
-      (coin) => coin.name.toLowerCase() === newCrypto.name.toLowerCase()
-    );
-    if (coinInfo) {
-      setCryptos((prevCryptos) => [
-        ...prevCryptos,
-        { ...newCrypto, id: coinInfo.id },
-      ]);
-    } else {
-      setError(`Couldn't find ${newCrypto.name} in the CoinGecko list.`);
-    }
-  };
-
-  const handleDeleteCrypto = (id) => {
-    setCryptos((prevCryptos) => prevCryptos.filter((crypto) => crypto.id !== id));
-  };
-
-  const handleEditCrypto = (crypto) => {
-    setEditingCrypto(crypto);
-  };
-
-  const handleSaveEdit = (editedCrypto) => {
-    setCryptos((prevCryptos) =>
-      prevCryptos.map((crypto) =>
-        crypto.id === editedCrypto.id ? editedCrypto : crypto
-      )
-    );
-    setEditingCrypto(null);
-  };
-
-  const handleCancelEdit = () => {
-    setEditingCrypto(null);
-  };
-
   return (
-    <div className="App">
-      <h1>Crypto Portfolio</h1>
-      {error && (
-        <p data-testid="error-message" style={{ color: 'red' }}>
-          {error}
-        </p>
-      )}
-      {loading && <p>Loading...</p>}
-      <button onClick={updatePrices} disabled={loading}>
-        Refresh Prices
-      </button>
-      {editingCrypto ? (
-        <EditCryptoForm
-          crypto={editingCrypto}
-          onSave={handleSaveEdit}
-          onCancel={handleCancelEdit}
-        />
-      ) : (
-        <>
-          <CryptoList
-            cryptos={cryptos}
-            onDelete={handleDeleteCrypto}
-            onEdit={handleEditCrypto}
-          />
-          <AddCryptoForm onAddCrypto={handleAddCrypto} coinsList={coinsList} />
-        </>
-      )}
-    </div>
+    <Router>
+      <div className="App">
+        <h1>Crypto Portfolio</h1>
+        <Routes>
+          <Route path="/" element={<HomeScreen cryptos={[]} onDelete={() => {}} />} />
+          <Route path="/add" element={<AddEditHoldingScreen />} />
+          <Route path="/edit/:id" element={<AddEditHoldingScreen />} />
+          <Route path="/details/:id" element={<DetailsScreen />} />
+        </Routes>
+      </div>
+    </Router>
   );
 }
 

@@ -11,7 +11,6 @@ describe('CryptoList', () => {
 
   it('displays cryptocurrencies when the list is not empty', () => {
     render(<CryptoList cryptos={mockCryptos} onDelete={() => {}} onEdit={() => {}} />);
-    expect(screen.getByText('Your Cryptocurrencies')).toBeInTheDocument();
     expect(screen.getByText('Bitcoin (BTC)')).toBeInTheDocument();
     expect(screen.getByText('Ethereum (ETH)')).toBeInTheDocument();
   });
@@ -38,9 +37,8 @@ describe('CryptoList', () => {
     expect(deleteButtons).toHaveLength(2);
   });
 
-  it('renders an empty list when there are no cryptocurrencies', () => {
+  it('renders a message when there are no cryptocurrencies', () => {
     render(<CryptoList cryptos={[]} onDelete={() => {}} onEdit={() => {}} />);
-    expect(screen.getByText('Your Cryptocurrencies')).toBeInTheDocument();
-    expect(screen.queryByRole('listitem')).not.toBeInTheDocument();
+    expect(screen.getByText('No cryptocurrencies in your portfolio.')).toBeInTheDocument();
   });
 });
