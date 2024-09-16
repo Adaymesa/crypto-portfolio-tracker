@@ -1,8 +1,8 @@
-const axios = require('axios');
+import axios from 'axios';
 
 const BASE_URL = 'https://api.coingecko.com/api/v3';
 
-const fetchCryptoPrices = async (cryptoIds) => {
+export const fetchCryptoPrices = async (cryptoIds) => {
   try {
     const response = await axios.get(`${BASE_URL}/simple/price`, {
       params: {
@@ -17,4 +17,12 @@ const fetchCryptoPrices = async (cryptoIds) => {
   }
 };
 
-module.exports = { fetchCryptoPrices };
+export const fetchCoinsList = async () => {
+  try {
+    const response = await axios.get(`${BASE_URL}/coins/list`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching coins list:', error);
+    throw error;
+  }
+};

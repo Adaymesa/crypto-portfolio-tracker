@@ -1,43 +1,68 @@
-const axios = require('axios');
-const { fetchCryptoPrices } = require('./cryptoService');
+import axios from 'axios';
+import { fetchCoinsList, fetchCryptoPrices } from './cryptoService';
 
 jest.mock('axios');
 
 describe('cryptoService', () => {
+  let consoleErrorSpy;
+
   beforeEach(() => {
-    jest.resetAllMocks();
+    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
   });
 
-  it('fetches crypto prices successfully', async () => {
-    const mockData = {
-      bitcoin: { usd: 50000 },
-      ethereum: { usd: 3000 }
-    };
-    axios.get = jest.fn().mockResolvedValue({ data: mockData });
+  afterEach(() => {
+    consoleErrorSpy.mockRestore();
+  });
 
-    const result = await fetchCryptoPrices(['bitcoin', 'ethereum']);
-    expect(result).toEqual(mockData);
-    expect(axios.get).toHaveBeenCalledWith(
-      'https://api.coingecko.com/api/v3/simple/price',
-      {
-        params: {
-          ids: 'bitcoin,ethereum',
-          vs_currencies: 'usd'
+  describe('fetchCoinsList', () => {
+    it('fetches coins list successfully', async () => {
+      const mockData = [
+        { id: '01coin', symbol: 'zoc', name: '01coin' },
+        { id: '0chain', symbol: 'zcn', name: 'Zus' }
+      ];
+      axios.get.mockResolvedValue({ data: mockData });
+
+      const result = await fetchCoinsList();
+      expect(result).toEqual(mockData);
+      expect(axios.get).toHaveBeenCalledWith('https://api.coingecko.com/api/v3/coins/list');
+    });
+
+    it('handles errors when fetching coins list', async () => {
+      const mockError = new Error('API error');
+      axios.get.mockRejectedValue(mockError);
+
+      await expect(fetchCoinsList()).rejects.toThrow('API error');
+      expect(consoleErrorSpy).toHaveBeenCalledWith('Error fetching coins list:', mockError);
+    });
+  });
+
+  describe('fetchCryptoPrices', () => {
+    it('fetches crypto prices successfully', async () => {
+      const mockData = {
+        bitcoin: { usd: 50000 },
+        ethereum: { usd: 3000 }
+      };
+      axios.get = jest.fn().mockResolvedValue({ data: mockData });
+  
+      const result = await fetchCryptoPrices(['bitcoin', 'ethereum']);
+      expect(result).toEqual(mockData);
+      expect(axios.get).toHaveBeenCalledWith(
+        'https://api.coingecko.com/api/v3/simple/price',
+        {
+          params: {
+            ids: 'bitcoin,ethereum',
+            vs_currencies: 'usd'
+          }
         }
-      }
-    );
-  });
-
-  it('handles errors when fetching crypto prices', async () => {
-    const mockError = new Error('API error');
-    axios.get = jest.fn().mockRejectedValue(mockError);
-
-    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-
-    await expect(fetchCryptoPrices(['bitcoin', 'ethereum'])).rejects.toThrow('API error');
-
-    expect(consoleSpy).toHaveBeenCalledWith('Error fetching crypto prices:', mockError);
-
-    consoleSpy.mockRestore();
+      );
+    });
+  
+    it('handles errors when fetching crypto prices', async () => {
+      const mockError = new Error('API error');
+      axios.get = jest.fn().mockRejectedValue(mockError);
+  
+      await expect(fetchCryptoPrices(['bitcoin', 'ethereum'])).rejects.toThrow('API error');
+      expect(consoleErrorSpy).toHaveBeenCalledWith('Error fetching crypto prices:', mockError);
+    });
   });
 });

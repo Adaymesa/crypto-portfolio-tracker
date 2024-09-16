@@ -3,7 +3,7 @@ import CryptoList from './components/CryptoList';
 import AddCryptoForm from './components/AddCryptoForm';
 import EditCryptoForm from './components/EditCryptoForm';
 import useLocalStorage from './hooks/useLocalStorage';
-const { fetchCryptoPrices } = require('./services/cryptoService');
+import { fetchCryptoPrices, fetchCoinsList } from './services/cryptoService';
 
 function App() {
   const [cryptos, setCryptos] = useLocalStorage('cryptos', [
