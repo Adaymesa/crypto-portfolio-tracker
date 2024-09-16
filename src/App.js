@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import CryptoList from './components/CryptoList';
 import AddCryptoForm from './components/AddCryptoForm';
-import EditCryptoForm from './components/EditCryptoForm';
 import useLocalStorage from './hooks/useLocalStorage';
 import { fetchCryptoPrices, fetchCoinsList } from './services/cryptoService';
 
@@ -10,8 +9,28 @@ function App() {
     { id: 'bitcoin', name: 'Bitcoin', symbol: 'BTC', quantity: 1, price: 0 },
     { id: 'ethereum', name: 'Ethereum', symbol: 'ETH', quantity: 10, price: 0 },
   ]);
+  const [coinsList, setCoinsList] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [editingCrypto, setEditingCrypto] = useState(null);
   const [pricesUpdated, setPricesUpdated] = useState(false);
+
+  const fetchCoins = useCallback(async () => {
+    try {
+      setLoading(true);
+      const coins = await fetchCoinsList();
+      setCoinsList(coins);
+    } catch (error) {
+      console.error('Failed to fetch coins list:', error);
+      setError('Failed to fetch coins list. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchCoins();
+  }, [fetchCoins]);
 
   const updatePrices = useCallback(async () => {
     if (pricesUpdated) return; 
@@ -53,22 +72,14 @@ function App() {
   return (
     <div className="App">
       <h1>Crypto Portfolio</h1>
-      {editingCrypto ? (
-        <EditCryptoForm
-          crypto={editingCrypto}
-          onSave={handleSaveEdit}
-          onCancel={() => setEditingCrypto(null)}
-        />
-      ) : (
-        <>
-          <CryptoList
-            cryptos={cryptos}
-            onDelete={handleDeleteCrypto}
-            onEdit={handleEditCrypto}
-          />
-          <AddCryptoForm onAddCrypto={handleAddCrypto} />
-        </>
-      )}
+      {loading && <p>Loading...</p>}
+      {error && <p style={{color: 'red'}}>{error}</p>}
+      <CryptoList
+        cryptos={cryptos}
+        onDelete={handleDeleteCrypto}
+        onEdit={handleEditCrypto}
+      />
+      <AddCryptoForm onAddCrypto={handleAddCrypto} coinsList={coinsList} />
     </div>
   );
 }
