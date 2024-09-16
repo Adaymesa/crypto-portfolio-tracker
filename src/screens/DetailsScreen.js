@@ -1,9 +1,10 @@
 import React from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
 function DetailsScreen() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const cryptos = useSelector(state => state.crypto.cryptos);
   const crypto = cryptos.find(c => c.id === id);
 
@@ -17,6 +18,7 @@ function DetailsScreen() {
       <p>Quantity: {crypto.quantity}</p>
       <p>Price: ${crypto.price}</p>
       <p>Total Value: ${crypto.total}</p>
+      <button onClick={() => navigate('/')}>Back to Home</button>
     </div>
   );
 }
