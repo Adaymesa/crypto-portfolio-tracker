@@ -3,29 +3,24 @@ import { useSelector, useDispatch } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import CryptoList from '../components/CryptoList';
 import { deleteCrypto, fetchPrices } from '../app/cryptoSlice';
-import { debounce } from 'lodash';
 
 function HomeScreen() {
     const cryptos = useSelector(state => state.crypto.cryptos);
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const debouncedFetch = useCallback(
-        debounce((ids) => {
-            dispatch(fetchPrices(ids));
-        }, 300),
-        [dispatch]
-    );
+    const fetchPricesImmediate = useCallback((ids) => {
+        console.log('Fetching prices for ids:', ids);
+        dispatch(fetchPrices(ids));
+    }, [dispatch]);
 
     useEffect(() => {
+        console.log('Effect running, cryptos:', cryptos);
         if (cryptos.length > 0) {
-            const debouncedFetch = debounce(() => {
-                dispatch(fetchPrices(cryptos.map(crypto => crypto.id)));
-            }, 500);
-            debouncedFetch();
-            return () => debouncedFetch.cancel;
+            const ids = cryptos.map(crypto => crypto.id);
+            fetchPricesImmediate(ids);
         }
-    }, [dispatch, cryptos]);
+    }, [cryptos, fetchPricesImmediate]);
 
     const handleDelete = (id) => {
         dispatch(deleteCrypto(id));

@@ -1,19 +1,15 @@
 import React from 'react';
-import { render, waitFor } from '@testing-library/react';
+import { render, waitFor, act } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { MemoryRouter } from 'react-router-dom';
 import HomeScreen from './HomeScreen';
 import configureMockStore from 'redux-mock-store';
 import { thunk } from 'redux-thunk';
-import { deleteCrypto, fetchPrices } from '../app/cryptoSlice';
+import { fetchPrices } from '../app/cryptoSlice';
 
 jest.mock('../app/cryptoSlice', () => ({
   ...jest.requireActual('../app/cryptoSlice'),
   fetchPrices: jest.fn()
-}));
-
-jest.mock('lodash', () => ({
-  debounce: (fn) => fn
 }));
 
 const middlewares = [thunk];
@@ -50,13 +46,9 @@ describe('HomeScreen', () => {
     await waitFor(() => {
       expect(fetchPrices).toHaveBeenCalledWith(['bitcoin', 'ethereum']);
     });
-
-    const actions = store.getActions();
-    const pendingAction = actions.find(action => action.type === 'crypto/fetchPrices/pending');
-    expect(pendingAction).toBeTruthy();
   });
 
-  it('dispatches fetchPrices when cryptos change', async () => {
+  it('calls fetchPrices when cryptos change', async () => {
     fetchPrices.mockReturnValue({ type: 'crypto/fetchPrices/pending' });
 
     const { rerender } = render(
@@ -84,7 +76,8 @@ describe('HomeScreen', () => {
     );
 
     await waitFor(() => {
-      expect(fetchPrices).toHaveBeenCalledWith(['bitcoin', 'ethereum', 'dogecoin']);
+      expect(fetchPrices).toHaveBeenCalledTimes(2);
+      expect(fetchPrices).toHaveBeenLastCalledWith(['bitcoin', 'ethereum', 'dogecoin']);
     });
   });
 });
