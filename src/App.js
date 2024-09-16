@@ -10,7 +10,7 @@ function App() {
       <div className="App">
         <h1>Crypto Portfolio</h1>
         <Routes>
-          <Route path="/" element={<HomeScreen cryptos={[]} onDelete={() => {}} />} />
+          <Route path="/" element={<HomeScreen />} />
           <Route path="/add" element={<AddEditHoldingScreen />} />
           <Route path="/edit/:id" element={<AddEditHoldingScreen />} />
           <Route path="/details/:id" element={<DetailsScreen />} />
