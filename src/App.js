@@ -29,18 +29,22 @@ function App() {
     }
   }, []);
 
-  useEffect(() => {
-    fetchCoins();
-  }, [fetchCoins]);
+  const findCoinInfo = useCallback((cryptoName) => {
+    return coinsList.find(coin => coin.name.toLowerCase() === cryptoName.toLowerCase());
+  }, [coinsList]);
+
+  const mapCryptosToCorrectIds = useCallback((cryptos) => {
+    return cryptos.map(crypto => {
+      const coinInfo = findCoinInfo(crypto.name);
+      return coinInfo ? { ...crypto, id: coinInfo.id } : crypto;
+    });
+  }, [findCoinInfo]);
 
   const updatePrices = useCallback(async () => {
     if (cryptos.length === 0 || coinsList.length === 0) return;
     try {
       setLoading(true);
-      const cryptosWithCorrectIds = cryptos.map(crypto => {
-        const coinInfo = coinsList.find(coin => coin.name.toLowerCase() === crypto.name.toLowerCase());
-        return coinInfo ? { ...crypto, id: coinInfo.id } : crypto;
-      });
+      const cryptosWithCorrectIds = mapCryptosToCorrectIds(cryptos);
       const newPrices = await fetchCryptoPrices(cryptosWithCorrectIds);
       setPrices(newPrices);
     } catch (error) {
@@ -49,7 +53,11 @@ function App() {
     } finally {
       setLoading(false);
     }
-  }, [cryptos, coinsList]);
+  }, [cryptos, coinsList, mapCryptosToCorrectIds]);
+
+  useEffect(() => {
+    fetchCoins();
+  }, [fetchCoins]);
 
   useEffect(() => {
     if (coinsList.length > 0) {
@@ -58,7 +66,7 @@ function App() {
   }, [coinsList, updatePrices]);
 
   const handleAddCrypto = (newCrypto) => {
-    const coinInfo = coinsList.find(coin => coin.name.toLowerCase() === newCrypto.name.toLowerCase());
+    const coinInfo = findCoinInfo(newCrypto.name);
     if (coinInfo) {
       setCryptos(prevCryptos => [...prevCryptos, { ...newCrypto, id: coinInfo.id }]);
     } else {
@@ -85,6 +93,11 @@ function App() {
     setEditingCrypto(null);
   };
 
+  const cryptosWithPrices = cryptos.map(crypto => ({
+    ...crypto,
+    price: prices[crypto.id]?.usd || 0
+  }));
+
   return (
     <div className="App">
       <h1>Crypto Portfolio</h1>
@@ -100,10 +113,7 @@ function App() {
       ) : (
         <>
           <CryptoList
-            cryptos={cryptos.map(crypto => ({
-              ...crypto,
-              price: prices[crypto.id]?.usd || 0
-            }))}
+            cryptos={cryptosWithPrices}
             onDelete={handleDeleteCrypto}
             onEdit={handleEditCrypto}
           />
