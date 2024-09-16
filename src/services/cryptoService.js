@@ -14,11 +14,13 @@ export const fetchCoinsList = async () => {
 
 export const fetchCryptoPrices = async (coinIds) => {
   try {
+    console.log('coinIds', coinIds);
     const response = await axios.get(`${API_BASE_URL}/simple/price`, {
-      params: {
+        params: {
         ids: coinIds.join(','),
         vs_currencies: 'usd'
       }
+
     });
     return response.data;
   } catch (error) {

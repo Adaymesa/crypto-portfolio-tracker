@@ -1,17 +1,31 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import CryptoList from '../components/CryptoList';
-import { deleteCrypto, fetchCoinsAndPrices } from '../app/CryptoSlice';
+import { deleteCrypto, fetchPrices } from '../app/cryptoSlice';
+import { debounce } from 'lodash';
 
 function HomeScreen() {
     const cryptos = useSelector(state => state.crypto.cryptos);
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
+    const debouncedFetch = useCallback(
+        debounce((ids) => {
+            dispatch(fetchPrices(ids));
+        }, 300),
+        [dispatch]
+    );
+
     useEffect(() => {
-        dispatch(fetchCoinsAndPrices());
-    }, [dispatch]);
+        if (cryptos.length > 0) {
+            const debouncedFetch = debounce(() => {
+                dispatch(fetchPrices(cryptos.map(crypto => crypto.id)));
+            }, 500);
+            debouncedFetch();
+            return () => debouncedFetch.cancel;
+        }
+    }, [dispatch, cryptos]);
 
     const handleDelete = (id) => {
         dispatch(deleteCrypto(id));

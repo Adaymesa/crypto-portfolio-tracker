@@ -1,7 +1,7 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { addCrypto, editCrypto } from '../app/CryptoSlice';
+import { addCrypto, editCrypto } from '../app/cryptoSlice';
 import AddCryptoForm from '../components/AddCryptoForm';
 import EditCryptoForm from '../components/EditCryptoForm';
 
