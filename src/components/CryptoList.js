@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 function CryptoList({ cryptos, onDelete, onEdit }) {
     if (cryptos.length === 0) {
@@ -9,7 +10,9 @@ function CryptoList({ cryptos, onDelete, onEdit }) {
         <ul>
             {cryptos.map(crypto => (
                 <li key={crypto.id} data-testid="crypto-item">
-                    <h3>{crypto.name} ({crypto.symbol})</h3>
+                    <Link to={`/details/${crypto.id}`}>
+                        <h3>{crypto.name} ({crypto.symbol})</h3>
+                    </Link>
                     <p>Quantity: {crypto.quantity}</p>
                     <p>Price: ${crypto.price}</p>
                     <p>Total: ${(crypto.total || (crypto.quantity * crypto.price)).toFixed(2)}</p>
