@@ -44,11 +44,7 @@ describe('cryptoService', () => {
       };
       axios.get.mockResolvedValue({ data: mockData });
 
-      const cryptos = [
-        { id: 'bitcoin', name: 'Bitcoin', symbol: 'BTC' },
-        { id: 'ethereum', name: 'Ethereum', symbol: 'ETH' }
-      ];
-      const result = await fetchCryptoPrices(cryptos);
+      const result = await fetchCryptoPrices(['bitcoin', 'ethereum']);
       expect(result).toEqual(mockData);
       expect(axios.get).toHaveBeenCalledWith(
         'https://api.coingecko.com/api/v3/simple/price',

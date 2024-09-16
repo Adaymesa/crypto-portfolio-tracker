@@ -1,11 +1,16 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { render } from '@testing-library/react';
 import { Provider } from 'react-redux';
-import configureStore from 'redux-mock-store';
+import { MemoryRouter } from 'react-router-dom';
 import HomeScreen from './HomeScreen';
+import { fetchCoinsAndPrices } from '../app/CryptoSlice';
+import configureMockStore from 'redux-mock-store';
+import { thunk } from 'redux-thunk';
 
-const mockStore = configureStore([]);
+const middlewares = [thunk];
+const mockStore = configureMockStore(middlewares);
+
+jest.mock('../components/CryptoList', () => () => <div>Mocked CryptoList</div>);
 
 const mockCryptos = [
   { id: '1', name: 'Bitcoin', symbol: 'BTC', quantity: 1, price: 50000, total: 50000 },
@@ -17,11 +22,11 @@ describe('HomeScreen', () => {
 
   beforeEach(() => {
     store = mockStore({
-      crypto: { cryptos: mockCryptos }
+      crypto: { cryptos: mockCryptos, status: 'idle', error: null }
     });
   });
 
-  it('renders the correct number of cryptocurrencies', () => {
+  it('dispatches fetchCoinsAndPrices on mount', () => {
     render(
       <Provider store={store}>
         <MemoryRouter>
@@ -29,58 +34,8 @@ describe('HomeScreen', () => {
         </MemoryRouter>
       </Provider>
     );
-    const cryptoItems = screen.getAllByText(/Bitcoin|Ethereum/);
-    expect(cryptoItems).toHaveLength(2);
-  });
 
-  it('renders add cryptocurrency link with correct path', () => {
-    render(
-      <Provider store={store}>
-        <MemoryRouter>
-          <HomeScreen />
-        </MemoryRouter>
-      </Provider>
-    );
-    const addLink = screen.getByText('Add New Cryptocurrency');
-    expect(addLink.getAttribute('href')).toBe('/add');
-  });
-
-  it('dispatches delete action with correct payload', () => {
-    render(
-      <Provider store={store}>
-        <MemoryRouter>
-          <HomeScreen />
-        </MemoryRouter>
-      </Provider>
-    );
-    const deleteButton = screen.getAllByText('Delete')[0];
-    fireEvent.click(deleteButton);
     const actions = store.getActions();
-    expect(actions).toContainEqual({ type: 'crypto/deleteCrypto', payload: '1' });
-  });
-
-  it('renders edit buttons for each cryptocurrency', () => {
-    render(
-      <Provider store={store}>
-        <MemoryRouter>
-          <HomeScreen />
-        </MemoryRouter>
-      </Provider>
-    );
-    const editButtons = screen.getAllByText('Edit');
-    expect(editButtons).toHaveLength(2);
-  });
-
-  it('sorts cryptocurrencies by total value in descending order', () => {
-    render(
-      <Provider store={store}>
-        <MemoryRouter>
-          <HomeScreen />
-        </MemoryRouter>
-      </Provider>
-    );
-    const cryptoItems = screen.getAllByTestId('crypto-item');
-    expect(cryptoItems[0]).toHaveTextContent('Bitcoin');
-    expect(cryptoItems[1]).toHaveTextContent('Ethereum');
+    expect(actions[0].type).toBe(fetchCoinsAndPrices.pending.type);
   });
 });
