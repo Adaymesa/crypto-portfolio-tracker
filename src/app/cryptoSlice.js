@@ -43,8 +43,8 @@ const cryptoSlice = createSlice({
           ...action.payload,
           id: matchedCoin.id,
           symbol: matchedCoin.symbol,
-          price: 0,
-          total: 0
+          price: action.payload.price || 0,
+          total: (action.payload.price || 0) * action.payload.quantity
         });
         state.error = null;
       } else {
@@ -54,7 +54,13 @@ const cryptoSlice = createSlice({
     editCrypto: (state, action) => {
       const index = state.cryptos.findIndex(crypto => crypto.id === action.payload.id);
       if (index !== -1) {
-        state.cryptos[index] = action.payload;
+        const updatedCrypto = {
+          ...state.cryptos[index],
+          ...action.payload,
+        };
+        updatedCrypto.price = action.payload.price || updatedCrypto.price;
+        updatedCrypto.total = updatedCrypto.quantity * updatedCrypto.price;
+        state.cryptos[index] = updatedCrypto;
       }
     },
     deleteCrypto: (state, action) => {

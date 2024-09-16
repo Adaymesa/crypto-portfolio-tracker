@@ -86,15 +86,20 @@ describe('cryptoSlice', () => {
     expect(state.error).toBeNull();
   });
 
-  it('should edit an existing crypto', () => {
+  it('should edit an existing crypto and recalculate total', () => {
     store.dispatch(setAllCoins([{ id: 'bitcoin', name: 'Bitcoin', symbol: 'BTC' }]));
-    store.dispatch(addCrypto({ name: 'Bitcoin', symbol: 'BTC', quantity: 1 }));
-    store.dispatch(editCrypto({ id: 'bitcoin', name: 'Bitcoin', symbol: 'BTC', quantity: 2 }));
+    store.dispatch(addCrypto({ id: 'bitcoin', name: 'Bitcoin', symbol: 'BTC', quantity: 1, price: 50000 }));
+  
+    let state = store.getState().crypto;
+    expect(state.cryptos[0].total).toBe(50000);
 
-    const state = store.getState().crypto;
+    store.dispatch(editCrypto({ id: 'bitcoin', quantity: 2 }));
+
+    state = store.getState().crypto;
 
     expect(state.cryptos).toHaveLength(1);
     expect(state.cryptos[0].quantity).toBe(2);
+    expect(state.cryptos[0].total).toBe(100000);
   });
 
   it('should delete an existing crypto', () => {
