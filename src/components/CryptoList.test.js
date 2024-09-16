@@ -44,4 +44,15 @@ describe('CryptoList', () => {
     
     expect(mockOnEdit).toHaveBeenCalledWith(mockCryptos[0]);
   });
+
+  it('displays total value for each cryptocurrency', () => {
+    const mockCryptos = [
+      { id: 'bitcoin', name: 'Bitcoin', symbol: 'BTC', quantity: 2, price: 30000 },
+      { id: 'ethereum', name: 'Ethereum', symbol: 'ETH', quantity: 5, price: 2000 },
+    ];
+    render(<CryptoList cryptos={mockCryptos} onDelete={() => {}} onEdit={() => {}} />);
+    
+    expect(screen.getByText('Total: $60000')).toBeInTheDocument();
+    expect(screen.getByText('Total: $10000')).toBeInTheDocument();
+  });
 });
