@@ -8,7 +8,6 @@ jest.mock('./services/cryptoService');
 
 describe('App', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
     fetchCryptoPrices.mockResolvedValue({
       bitcoin: { usd: 50000 },
       ethereum: { usd: 3000 }
@@ -38,18 +37,17 @@ describe('App', () => {
       resolvePromise = resolve;
     }));
 
-    await act(async () => {
-      render(<App />);
-    });
+    render(<App />);
 
     expect(screen.getByText(/Loading.../i)).toBeInTheDocument();
 
     await act(async () => {
       resolvePromise([]);
-      jest.runAllTimers();
     });
 
-    expect(screen.queryByText(/Loading.../i)).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.queryByText(/Loading.../i)).not.toBeInTheDocument();
+    });
   });
 
   it('displays error message if fetching coins list fails', async () => {

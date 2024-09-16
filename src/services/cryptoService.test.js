@@ -42,9 +42,13 @@ describe('cryptoService', () => {
         bitcoin: { usd: 50000 },
         ethereum: { usd: 3000 }
       };
-      axios.get = jest.fn().mockResolvedValue({ data: mockData });
-  
-      const result = await fetchCryptoPrices(['bitcoin', 'ethereum']);
+      axios.get.mockResolvedValue({ data: mockData });
+
+      const cryptos = [
+        { id: 'bitcoin', name: 'Bitcoin', symbol: 'BTC' },
+        { id: 'ethereum', name: 'Ethereum', symbol: 'ETH' }
+      ];
+      const result = await fetchCryptoPrices(cryptos);
       expect(result).toEqual(mockData);
       expect(axios.get).toHaveBeenCalledWith(
         'https://api.coingecko.com/api/v3/simple/price',
@@ -56,11 +60,11 @@ describe('cryptoService', () => {
         }
       );
     });
-  
+
     it('handles errors when fetching crypto prices', async () => {
       const mockError = new Error('API error');
-      axios.get = jest.fn().mockRejectedValue(mockError);
-  
+      axios.get.mockRejectedValue(mockError);
+
       await expect(fetchCryptoPrices(['bitcoin', 'ethereum'])).rejects.toThrow('API error');
       expect(consoleErrorSpy).toHaveBeenCalledWith('Error fetching crypto prices:', mockError);
     });
