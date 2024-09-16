@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, waitFor, act } from '@testing-library/react';
+import { render, waitFor } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { MemoryRouter } from 'react-router-dom';
 import HomeScreen from './HomeScreen';
@@ -17,22 +17,23 @@ const mockStore = configureMockStore(middlewares);
 
 jest.mock('../components/CryptoList', () => () => <div>Mocked CryptoList</div>);
 
-const mockCryptos = [
-  { id: 'bitcoin', name: 'Bitcoin', symbol: 'BTC', quantity: 1, price: 50000, total: 50000 },
-  { id: 'ethereum', name: 'Ethereum', symbol: 'ETH', quantity: 10, price: 3000, total: 30000 },
-];
-
 describe('HomeScreen', () => {
   let store;
 
   beforeEach(() => {
-    store = mockStore({
-      crypto: { cryptos: mockCryptos, status: 'idle', error: null }
-    });
     fetchPrices.mockClear();
   });
 
-  it('dispatches fetchPrices with correct coin IDs on mount', async () => {
+  it('dispatches fetchPrices only for cryptos without price on mount', async () => {
+    const mockCryptos = [
+      { id: 'bitcoin', name: 'Bitcoin', symbol: 'BTC', quantity: 1, price: 50000, total: 50000 },
+      { id: 'ethereum', name: 'Ethereum', symbol: 'ETH', quantity: 10, price: null, total: null },
+    ];
+
+    store = mockStore({
+      crypto: { cryptos: mockCryptos, status: 'idle', error: null }
+    });
+
     fetchPrices.mockReturnValue({ type: 'crypto/fetchPrices/pending' });
 
     render(
@@ -44,30 +45,21 @@ describe('HomeScreen', () => {
     );
 
     await waitFor(() => {
-      expect(fetchPrices).toHaveBeenCalledWith(['bitcoin', 'ethereum']);
+      expect(fetchPrices).toHaveBeenCalledWith(['ethereum']);
     });
   });
 
-  it('calls fetchPrices when cryptos change', async () => {
-    fetchPrices.mockReturnValue({ type: 'crypto/fetchPrices/pending' });
-
-    const { rerender } = render(
-      <Provider store={store}>
-        <MemoryRouter>
-          <HomeScreen />
-        </MemoryRouter>
-      </Provider>
-    );
+  it('does not dispatch fetchPrices when all cryptos have prices', async () => {
+    const mockCryptos = [
+      { id: 'bitcoin', name: 'Bitcoin', symbol: 'BTC', quantity: 1, price: 50000, total: 50000 },
+      { id: 'ethereum', name: 'Ethereum', symbol: 'ETH', quantity: 10, price: 3000, total: 30000 },
+    ];
 
     store = mockStore({
-      crypto: { 
-        cryptos: [...mockCryptos, { id: 'dogecoin', name: 'Dogecoin', symbol: 'DOGE', quantity: 100, price: 0.5, total: 50 }],
-        status: 'idle',
-        error: null
-      }
+      crypto: { cryptos: mockCryptos, status: 'idle', error: null }
     });
 
-    rerender(
+    render(
       <Provider store={store}>
         <MemoryRouter>
           <HomeScreen />
@@ -76,8 +68,7 @@ describe('HomeScreen', () => {
     );
 
     await waitFor(() => {
-      expect(fetchPrices).toHaveBeenCalledTimes(2);
-      expect(fetchPrices).toHaveBeenLastCalledWith(['bitcoin', 'ethereum', 'dogecoin']);
+      expect(fetchPrices).not.toHaveBeenCalled();
     });
   });
 });

@@ -9,18 +9,18 @@ function HomeScreen() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const fetchPricesImmediate = useCallback((ids) => {
-        console.log('Fetching prices for ids:', ids);
-        dispatch(fetchPrices(ids));
-    }, [dispatch]);
+    const fetchMissingPrices = useCallback(() => {
+        const cryptosWithoutPrice = cryptos.filter(crypto => !crypto.price);
+        if (cryptosWithoutPrice.length > 0) {
+            const ids = cryptosWithoutPrice.map(crypto => crypto.id);
+            console.log('Fetching prices for ids:', ids);
+            dispatch(fetchPrices(ids));
+        }
+    }, [cryptos, dispatch]);
 
     useEffect(() => {
-        console.log('Effect running, cryptos:', cryptos);
-        if (cryptos.length > 0) {
-            const ids = cryptos.map(crypto => crypto.id);
-            fetchPricesImmediate(ids);
-        }
-    }, [cryptos, fetchPricesImmediate]);
+        fetchMissingPrices();
+    }, [fetchMissingPrices]);
 
     const handleDelete = (id) => {
         dispatch(deleteCrypto(id));

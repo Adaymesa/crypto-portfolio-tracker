@@ -70,7 +70,7 @@ const cryptoSlice = createSlice({
         state.status = 'succeeded';
         state.cryptos = state.cryptos.map(crypto => ({
           ...crypto,
-          price: action.payload[crypto.id]?.usd || 0,
+          price: action.payload[crypto.id]?.usd || null,
           total: (action.payload[crypto.id]?.usd || 0) * crypto.quantity
         }));
       })
