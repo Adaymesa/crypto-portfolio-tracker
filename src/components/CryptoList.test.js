@@ -5,8 +5,8 @@ import CryptoList from './CryptoList';
 
 describe('CryptoList', () => {
   const mockCryptos = [
-    { id: 'bitcoin', name: 'Bitcoin', symbol: 'BTC', quantity: 2, price: 30000 },
-    { id: 'ethereum', name: 'Ethereum', symbol: 'ETH', quantity: 5, price: 2000 },
+    { id: 'bitcoin', name: 'Bitcoin', symbol: 'BTC', quantity: 2, price: 30000, total: 60000 },
+    { id: 'ethereum', name: 'Ethereum', symbol: 'ETH', quantity: 5, price: 2000, total: 10000 },
   ];
 
   it('displays cryptocurrencies when the list is not empty', () => {
