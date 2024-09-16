@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, act, waitFor } from '@testing-library/react';
+import { render, screen, act, waitFor, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import App from './App';
 import { fetchCryptoPrices, fetchCoinsList } from './services/cryptoService';
@@ -16,7 +16,7 @@ Object.defineProperty(window, 'localStorage', { value: localStorageMock });
 beforeEach(() => {
   jest.clearAllMocks();
   localStorageMock.getItem.mockReturnValue(JSON.stringify([
-    { id: 'bitcoin', name: 'Bitcoin', symbol: 'BTC', quantity: 1 },
+    { id: 'bitcoin', name: 'Bitcoin', symbol: 'BTC', quantity: 2 },
     { id: 'ethereum', name: 'Ethereum', symbol: 'ETH', quantity: 10 }
   ]));
 
@@ -55,8 +55,12 @@ describe('App', () => {
   
     expect(screen.getByText(/Bitcoin \(BTC\)/)).toBeInTheDocument();
     expect(screen.getByText(/Price: \$50000/)).toBeInTheDocument();
+    expect(screen.getByText(/Quantity: 2/)).toBeInTheDocument();
+    expect(screen.getByText(/Total: \$100000/)).toBeInTheDocument();
     expect(screen.getByText(/Ethereum \(ETH\)/)).toBeInTheDocument();
     expect(screen.getByText(/Price: \$3000/)).toBeInTheDocument();
+    expect(screen.getByText(/Quantity: 10/)).toBeInTheDocument();
+    expect(screen.getByText(/Total: \$30000/)).toBeInTheDocument();
   });
 
   it('displays error message if fetching coins list fails', async () => {

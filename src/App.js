@@ -27,26 +27,21 @@ function App() {
   }, []);
 
   const updatePrices = useCallback(async () => {
-    console.log('cryptos', cryptos);
-    console.log('coinsList', coinsList);
     if (!cryptos.length || !coinsList.length) return;
     try {
       setLoading(true);
       setError(null);
 
-      const updatedCryptos = cryptos.map((crypto) => {
-        const coinInfo = coinsList.find(
-          (coin) => coin.name.toLowerCase() === crypto.name.toLowerCase()
-        );
-        return coinInfo ? { ...crypto, id: coinInfo.id } : crypto;
-      });
+      const newPrices = await fetchCryptoPrices(cryptos);
 
-      const newPrices = await fetchCryptoPrices(updatedCryptos);
-
-      setCryptos(updatedCryptos.map((crypto) => ({
-        ...crypto,
-        price: newPrices[crypto.id]?.usd || crypto.price || 0,
-      })));
+      setCryptos(prevCryptos => prevCryptos.map((crypto) => {
+        const newPrice = newPrices[crypto.id]?.usd || crypto.price || 0;
+        return {
+          ...crypto,
+          price: newPrice,
+          total: crypto.quantity * newPrice
+        };
+      }));
     } catch (error) {
       console.error('Failed to fetch crypto prices:', error);
       setError('Failed to fetch crypto prices. Please try again later.');
