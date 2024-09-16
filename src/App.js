@@ -6,19 +6,16 @@ import useLocalStorage from './hooks/useLocalStorage';
 import { fetchCryptoPrices, fetchCoinsList } from './services/cryptoService';
 
 function App() {
-  const [cryptos, setCryptos] = useLocalStorage('cryptos', [
-    { id: 'bitcoin', name: 'Bitcoin', symbol: 'BTC', quantity: 1 },
-    { id: 'ethereum', name: 'Ethereum', symbol: 'ETH', quantity: 10 },
-  ]);
-  const [prices, setPrices] = useState({});
+  const [cryptos, setCryptos] = useLocalStorage('cryptos', []);
   const [coinsList, setCoinsList] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [editingCrypto, setEditingCrypto] = useState(null);
 
   const fetchCoins = useCallback(async () => {
     try {
       setLoading(true);
+      setError(null);
       const coins = await fetchCoinsList();
       setCoinsList(coins);
     } catch (error) {
@@ -29,53 +26,61 @@ function App() {
     }
   }, []);
 
-  const findCoinInfo = useCallback((cryptoName) => {
-    return coinsList.find(coin => coin.name.toLowerCase() === cryptoName.toLowerCase());
-  }, [coinsList]);
-
-  const mapCryptosToCorrectIds = useCallback((cryptos) => {
-    return cryptos.map(crypto => {
-      const coinInfo = findCoinInfo(crypto.name);
-      return coinInfo ? { ...crypto, id: coinInfo.id } : crypto;
-    });
-  }, [findCoinInfo]);
-
   const updatePrices = useCallback(async () => {
-    if (cryptos.length === 0 || coinsList.length === 0) return;
+    console.log('cryptos', cryptos);
+    console.log('coinsList', coinsList);
+    if (!cryptos.length || !coinsList.length) return;
     try {
       setLoading(true);
-      const cryptosWithCorrectIds = mapCryptosToCorrectIds(cryptos);
-      const newPrices = await fetchCryptoPrices(cryptosWithCorrectIds);
-      setPrices(newPrices);
+      setError(null);
+
+      const updatedCryptos = cryptos.map((crypto) => {
+        const coinInfo = coinsList.find(
+          (coin) => coin.name.toLowerCase() === crypto.name.toLowerCase()
+        );
+        return coinInfo ? { ...crypto, id: coinInfo.id } : crypto;
+      });
+
+      const newPrices = await fetchCryptoPrices(updatedCryptos);
+
+      setCryptos(updatedCryptos.map((crypto) => ({
+        ...crypto,
+        price: newPrices[crypto.id]?.usd || crypto.price || 0,
+      })));
     } catch (error) {
       console.error('Failed to fetch crypto prices:', error);
       setError('Failed to fetch crypto prices. Please try again later.');
     } finally {
       setLoading(false);
     }
-  }, [cryptos, coinsList, mapCryptosToCorrectIds]);
+  }, [cryptos, coinsList]);
 
   useEffect(() => {
     fetchCoins();
   }, [fetchCoins]);
 
   useEffect(() => {
-    if (coinsList.length > 0) {
+    if (cryptos.length && coinsList.length) {
       updatePrices();
     }
-  }, [coinsList, updatePrices]);
+  }, [coinsList]); 
 
   const handleAddCrypto = (newCrypto) => {
-    const coinInfo = findCoinInfo(newCrypto.name);
+    const coinInfo = coinsList.find(
+      (coin) => coin.name.toLowerCase() === newCrypto.name.toLowerCase()
+    );
     if (coinInfo) {
-      setCryptos(prevCryptos => [...prevCryptos, { ...newCrypto, id: coinInfo.id }]);
+      setCryptos((prevCryptos) => [
+        ...prevCryptos,
+        { ...newCrypto, id: coinInfo.id },
+      ]);
     } else {
       setError(`Couldn't find ${newCrypto.name} in the CoinGecko list.`);
     }
   };
 
   const handleDeleteCrypto = (id) => {
-    setCryptos(prevCryptos => prevCryptos.filter(crypto => crypto.id !== id));
+    setCryptos((prevCryptos) => prevCryptos.filter((crypto) => crypto.id !== id));
   };
 
   const handleEditCrypto = (crypto) => {
@@ -83,9 +88,11 @@ function App() {
   };
 
   const handleSaveEdit = (editedCrypto) => {
-    setCryptos(prevCryptos => prevCryptos.map(crypto => 
-      crypto.id === editedCrypto.id ? editedCrypto : crypto
-    ));
+    setCryptos((prevCryptos) =>
+      prevCryptos.map((crypto) =>
+        crypto.id === editedCrypto.id ? editedCrypto : crypto
+      )
+    );
     setEditingCrypto(null);
   };
 
@@ -93,17 +100,18 @@ function App() {
     setEditingCrypto(null);
   };
 
-  const cryptosWithPrices = cryptos.map(crypto => ({
-    ...crypto,
-    price: prices[crypto.id]?.usd || 0
-  }));
-
   return (
     <div className="App">
       <h1>Crypto Portfolio</h1>
+      {error && (
+        <p data-testid="error-message" style={{ color: 'red' }}>
+          {error}
+        </p>
+      )}
       {loading && <p>Loading...</p>}
-      {error && <p style={{color: 'red'}}>{error}</p>}
-      <button onClick={updatePrices} disabled={loading}>Refresh Prices</button>
+      <button onClick={updatePrices} disabled={loading}>
+        Refresh Prices
+      </button>
       {editingCrypto ? (
         <EditCryptoForm
           crypto={editingCrypto}
@@ -113,7 +121,7 @@ function App() {
       ) : (
         <>
           <CryptoList
-            cryptos={cryptosWithPrices}
+            cryptos={cryptos}
             onDelete={handleDeleteCrypto}
             onEdit={handleEditCrypto}
           />

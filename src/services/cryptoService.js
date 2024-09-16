@@ -5,7 +5,6 @@ const BASE_URL = 'https://api.coingecko.com/api/v3';
 export const fetchCryptoPrices = async (cryptos) => {
   try {
     const ids = cryptos.map(crypto => crypto.id).join(',');
-    console.log('Fetching prices for ids:', ids); 
     const response = await axios.get(`${BASE_URL}/simple/price`, {
       params: {
         ids: ids,

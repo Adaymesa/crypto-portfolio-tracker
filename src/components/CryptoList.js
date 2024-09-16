@@ -7,7 +7,7 @@ const CryptoList = ({ cryptos, onDelete, onEdit }) => {
       {cryptos.length > 0 ? (
         <ul>
           {cryptos.map(crypto => (
-            <li key={crypto.id}>
+            <li key={crypto.id || `${crypto.name}-${crypto.symbol}`}>
               {crypto.name} ({crypto.symbol})
               <p>Quantity: {crypto.quantity}</p>
               <p>Price: ${crypto.price}</p>
