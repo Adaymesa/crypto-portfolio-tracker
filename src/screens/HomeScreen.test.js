@@ -70,4 +70,17 @@ describe('HomeScreen', () => {
     const editButtons = screen.getAllByText('Edit');
     expect(editButtons).toHaveLength(2);
   });
+
+  it('sorts cryptocurrencies by total value in descending order', () => {
+    render(
+      <Provider store={store}>
+        <MemoryRouter>
+          <HomeScreen />
+        </MemoryRouter>
+      </Provider>
+    );
+    const cryptoItems = screen.getAllByTestId('crypto-item');
+    expect(cryptoItems[0]).toHaveTextContent('Bitcoin');
+    expect(cryptoItems[1]).toHaveTextContent('Ethereum');
+  });
 });
