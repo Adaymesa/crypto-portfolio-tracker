@@ -1,23 +1,12 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { BrowserRouter as Router } from 'react-router-dom';
+import { MemoryRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 import HomeScreen from './HomeScreen';
 
-jest.mock('../components/CryptoList', () => {
-  return function MockCryptoList({ cryptos, onDelete, onEdit }) {
-    return (
-      <div data-testid="crypto-list">
-        {cryptos.length} cryptocurrencies
-        <button onClick={() => onDelete('1')}>Delete</button>
-        <button onClick={() => onEdit('1')}>Edit</button>
-      </div>
-    );
-  };
-});
-
 const mockStore = configureStore([]);
+
 const mockCryptos = [
   { id: '1', name: 'Bitcoin', symbol: 'BTC', quantity: 1, price: 50000, total: 50000 },
   { id: '2', name: 'Ethereum', symbol: 'ETH', quantity: 10, price: 3000, total: 30000 },
@@ -32,41 +21,53 @@ describe('HomeScreen', () => {
     });
   });
 
-  it('renders the cryptocurrency list', () => {
+  it('renders the correct number of cryptocurrencies', () => {
     render(
       <Provider store={store}>
-        <Router>
+        <MemoryRouter>
           <HomeScreen />
-        </Router>
+        </MemoryRouter>
       </Provider>
     );
-    expect(screen.getByTestId('crypto-list')).toHaveTextContent('2 cryptocurrencies');
+    const cryptoItems = screen.getAllByText(/Bitcoin|Ethereum/);
+    expect(cryptoItems).toHaveLength(2);
   });
 
-  it('renders the add new cryptocurrency link', () => {
+  it('renders add cryptocurrency link with correct path', () => {
     render(
       <Provider store={store}>
-        <Router>
+        <MemoryRouter>
           <HomeScreen />
-        </Router>
+        </MemoryRouter>
       </Provider>
     );
-    expect(screen.getByText('Add New Cryptocurrency')).toBeInTheDocument();
+    const addLink = screen.getByText('Add New Cryptocurrency');
+    expect(addLink.getAttribute('href')).toBe('/add');
   });
 
-  it('handles delete and edit actions', () => {
-    const { getByText } = render(
+  it('dispatches delete action with correct payload', () => {
+    render(
       <Provider store={store}>
-        <Router>
+        <MemoryRouter>
           <HomeScreen />
-        </Router>
+        </MemoryRouter>
       </Provider>
     );
-    
-    fireEvent.click(getByText('Delete'));
-    expect(store.getActions()).toContainEqual({ type: 'crypto/deleteCrypto', payload: '1' });
+    const deleteButton = screen.getAllByText('Delete')[0];
+    fireEvent.click(deleteButton);
+    const actions = store.getActions();
+    expect(actions).toContainEqual({ type: 'crypto/deleteCrypto', payload: '1' });
+  });
 
-    fireEvent.click(getByText('Edit'));
-    expect(() => fireEvent.click(getByText('Edit'))).not.toThrow();
+  it('renders edit buttons for each cryptocurrency', () => {
+    render(
+      <Provider store={store}>
+        <MemoryRouter>
+          <HomeScreen />
+        </MemoryRouter>
+      </Provider>
+    );
+    const editButtons = screen.getAllByText('Edit');
+    expect(editButtons).toHaveLength(2);
   });
 });
