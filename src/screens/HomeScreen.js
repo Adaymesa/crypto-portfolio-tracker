@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import CryptoList from '../components/CryptoList';
@@ -7,21 +7,16 @@ import './HomeScreen.css';
 
 function HomeScreen() {
     const cryptos = useSelector(state => state.crypto.cryptos);
+    const pricesFetched = useSelector(state => state.crypto.pricesFetched);
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const fetchMissingPrices = useCallback(() => {
-        const cryptosWithoutPrice = cryptos.filter(crypto => !crypto.price);
-        if (cryptosWithoutPrice.length > 0) {
-            const ids = cryptosWithoutPrice.map(crypto => crypto.id);
-            console.log('Fetching prices for ids:', ids);
+    useEffect(() => {
+        if (!pricesFetched && cryptos.length > 0) {
+            const ids = cryptos.map(crypto => crypto.id);
             dispatch(fetchPrices(ids));
         }
-    }, [cryptos, dispatch]);
-
-    useEffect(() => {
-        fetchMissingPrices();
-    }, [fetchMissingPrices]);
+    }, [cryptos, pricesFetched, dispatch]);
 
     const handleDelete = (id) => {
         dispatch(deleteCrypto(id));

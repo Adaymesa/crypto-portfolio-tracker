@@ -22,19 +22,18 @@ describe('HomeScreen', () => {
 
   beforeEach(() => {
     fetchPrices.mockClear();
+    fetchPrices.mockImplementation(() => ({ type: 'crypto/fetchPrices' }));
   });
 
-  it('dispatches fetchPrices only for cryptos without price on mount', async () => {
+  it('dispatches fetchPrices when pricesFetched is false and cryptos exist', async () => {
     const mockCryptos = [
       { id: 'bitcoin', name: 'Bitcoin', symbol: 'BTC', quantity: 1, price: 50000, total: 50000 },
-      { id: 'ethereum', name: 'Ethereum', symbol: 'ETH', quantity: 10, price: null, total: null },
+      { id: 'ethereum', name: 'Ethereum', symbol: 'ETH', quantity: 10, price: 3000, total: 30000 },
     ];
 
     store = mockStore({
-      crypto: { cryptos: mockCryptos, status: 'idle', error: null }
+      crypto: { cryptos: mockCryptos, status: 'idle', error: null, pricesFetched: false }
     });
-
-    fetchPrices.mockReturnValue({ type: 'crypto/fetchPrices/pending' });
 
     render(
       <Provider store={store}>
@@ -45,18 +44,18 @@ describe('HomeScreen', () => {
     );
 
     await waitFor(() => {
-      expect(fetchPrices).toHaveBeenCalledWith(['ethereum']);
+      expect(fetchPrices).toHaveBeenCalledWith(['bitcoin', 'ethereum']);
     });
   });
 
-  it('does not dispatch fetchPrices when all cryptos have prices', async () => {
+  it('does not dispatch fetchPrices when pricesFetched is true', async () => {
     const mockCryptos = [
       { id: 'bitcoin', name: 'Bitcoin', symbol: 'BTC', quantity: 1, price: 50000, total: 50000 },
       { id: 'ethereum', name: 'Ethereum', symbol: 'ETH', quantity: 10, price: 3000, total: 30000 },
     ];
 
     store = mockStore({
-      crypto: { cryptos: mockCryptos, status: 'idle', error: null }
+      crypto: { cryptos: mockCryptos, status: 'idle', error: null, pricesFetched: true }
     });
 
     render(

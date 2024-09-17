@@ -3,7 +3,7 @@ import { fetchCoinsList, fetchCryptoPrices } from '../services/cryptoService';
 
 export const fetchPrices = createAsyncThunk(
   'crypto/fetchPrices',
-  async (coinIds, { getState: _ }) => {
+  async (coinIds, { getState }) => {
     const prices = await fetchCryptoPrices(coinIds);
     return prices;
   }
@@ -28,7 +28,8 @@ const cryptoSlice = createSlice({
     cryptos: [],
     allCoins: [],
     status: 'idle',
-    error: null
+    error: null,
+    pricesFetched: false
   },
   reducers: {
     setAllCoins: (state, action) => {
@@ -47,6 +48,7 @@ const cryptoSlice = createSlice({
           total: (action.payload.price || 0) * action.payload.quantity
         });
         state.error = null;
+        state.pricesFetched = false; 
       } else {
         state.error = `Cryptocurrency ${action.payload.name} not found in the list of supported coins`;
       }
@@ -76,9 +78,10 @@ const cryptoSlice = createSlice({
         state.status = 'succeeded';
         state.cryptos = state.cryptos.map(crypto => ({
           ...crypto,
-          price: action.payload[crypto.id]?.usd || null,
-          total: (action.payload[crypto.id]?.usd || 0) * crypto.quantity
+          price: action.payload[crypto.id]?.usd || crypto.price,
+          total: (action.payload[crypto.id]?.usd || crypto.price) * crypto.quantity
         }));
+        state.pricesFetched = true;
       })
       .addCase(fetchPrices.rejected, (state, action) => {
         state.status = 'failed';
