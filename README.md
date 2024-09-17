@@ -1,4 +1,5 @@
 # Crypto Portfolio Tracker
+[![CI](https://github.com/Adaymesa/crypto-portfolio-tracker-bfin-final/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/Adaymesa/crypto-portfolio-tracker-bfin-final/actions/workflows/ci.yml)
 
 This project is a React-based cryptocurrency portfolio tracker that allows users to add, view, and manage their cryptocurrency holdings.
 
