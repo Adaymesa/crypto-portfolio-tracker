@@ -40,7 +40,7 @@ const AddCryptoForm = ({ onAddCrypto }) => {
           onChange={(e) => setName(e.target.value)}
           required
         />
-        {errors.name && <span>{errors.name}</span>}
+        {errors.name && <span className="error">{errors.name}</span>}
       </div>
       <div>
         <label htmlFor="symbol">Symbol:</label>
@@ -50,7 +50,7 @@ const AddCryptoForm = ({ onAddCrypto }) => {
           onChange={(e) => setSymbol(e.target.value)}
           required
         />
-        {errors.symbol && <span>{errors.symbol}</span>}
+        {errors.symbol && <span className="error">{errors.symbol}</span>}
       </div>
       <div>
         <label htmlFor="quantity">Quantity:</label>
@@ -63,11 +63,11 @@ const AddCryptoForm = ({ onAddCrypto }) => {
           min="0"
           step="any"
         />
-        {errors.quantity && <span>{errors.quantity}</span>}
+        {errors.quantity && <span className="error">{errors.quantity}</span>}
       </div>
       <button type="submit">Add Cryptocurrency</button>
     </form>
   );
-};
+}
 
 export default AddCryptoForm;

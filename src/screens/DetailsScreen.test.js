@@ -43,10 +43,23 @@ describe('DetailsScreen', () => {
       </Provider>
     );
 
-    expect(screen.getByText('Bitcoin (BTC)')).toBeInTheDocument();
-    expect(screen.getByText('Quantity: 1')).toBeInTheDocument();
-    expect(screen.getByText('Price: $50000')).toBeInTheDocument();
-    expect(screen.getByText('Total Value: $50000')).toBeInTheDocument();
+    expect(screen.getByText('Bitcoin (BTC) Details')).toBeInTheDocument();
+    expect(screen.getByText('Name:')).toBeInTheDocument();
+    expect(screen.getByText('Bitcoin')).toBeInTheDocument();
+    expect(screen.getByText('Symbol:')).toBeInTheDocument();
+    expect(screen.getByText('BTC')).toBeInTheDocument();
+    expect(screen.getByText('Quantity:')).toBeInTheDocument();
+    expect(screen.getByText('1')).toBeInTheDocument();
+    
+    expect(screen.getByText((content, element) => {
+      return element.textContent === 'Price: $50000.00';
+    })).toBeInTheDocument();
+
+    expect(screen.getByText((content, element) => {
+      return element.textContent === 'Total Value: $50000.00';
+    })).toBeInTheDocument();
+
+    expect(screen.getByText('Back to Home')).toBeInTheDocument();
   });
 
   it('displays a message when cryptocurrency is not found', () => {

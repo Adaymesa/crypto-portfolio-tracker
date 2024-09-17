@@ -67,8 +67,10 @@ const EditCryptoForm = ({ crypto, onSave, onCancel }) => {
         />
         {errors.quantity && <span>{errors.quantity}</span>}
       </div>
-      <button type="submit">Save</button>
-      <button type="button" onClick={onCancel}>Cancel</button>
+      <div className="form-buttons">
+        <button type="submit">Save</button>
+        <button type="button" onClick={onCancel}>Cancel</button>
+      </div>
     </form>
   );
 };

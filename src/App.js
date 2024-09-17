@@ -21,7 +21,6 @@ function App() {
   return (
     <Router>
       <div className="App">
-        <h1>Crypto Portfolio</h1>
         <Routes>
           <Route path="/" element={<HomeScreen />} />
           <Route path="/add" element={<AddEditHoldingScreen />} />

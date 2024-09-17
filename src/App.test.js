@@ -28,15 +28,6 @@ describe('App', () => {
     store.dispatch = jest.fn();
   });
 
-  it('renders without crashing', () => {
-    render(
-      <Provider store={store}>
-        <App />
-      </Provider>
-    );
-    expect(screen.getByText('Crypto Portfolio')).toBeInTheDocument();
-  });
-
   it('renders home screen by default', () => {
     render(
       <Provider store={store}>

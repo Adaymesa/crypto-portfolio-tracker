@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { addCrypto, editCrypto } from '../app/cryptoSlice';
 import AddCryptoForm from '../components/AddCryptoForm';
 import EditCryptoForm from '../components/EditCryptoForm';
+import './AddEditHoldingScreen.css';
 
 function AddEditHoldingScreen() {
   const { id } = useParams();
@@ -23,7 +24,7 @@ function AddEditHoldingScreen() {
   };
 
   return (
-    <div>
+    <div className="add-edit-container">
       <h2>{id ? 'Edit Cryptocurrency' : 'Add New Cryptocurrency'}</h2>
       {id ? (
         <EditCryptoForm crypto={crypto} onSave={handleEditCrypto} onCancel={() => navigate('/')} />

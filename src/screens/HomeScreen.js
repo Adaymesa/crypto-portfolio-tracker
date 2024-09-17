@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import CryptoList from '../components/CryptoList';
 import { deleteCrypto, fetchPrices } from '../app/cryptoSlice';
+import './HomeScreen.css';
 
 function HomeScreen() {
     const cryptos = useSelector(state => state.crypto.cryptos);
@@ -31,14 +32,15 @@ function HomeScreen() {
     };
 
     return (
-        <div>
-            <h2>Your Cryptocurrencies</h2>
+        <div className="home-container">
+            <Link to="/add" className="add-button">Add New Cryptocurrency</Link>
+            <h2>Crypto Portfolio</h2>
             <CryptoList 
                 cryptos={cryptos} 
                 onDelete={handleDelete} 
                 onEdit={handleEdit}
+                onNavigate={(id) => navigate(`/edit/${id}`)}
             />
-            <Link to="/add">Add New Cryptocurrency</Link>
         </div>
     );
 }

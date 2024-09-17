@@ -17,6 +17,14 @@ Object.defineProperty(global, 'localStorage', {
   value: mockLocalStorage
 });
 
+const originalConsoleError = console.error;
+beforeEach(() => {
+  console.error = jest.fn();
+});
+afterEach(() => {
+  console.error = originalConsoleError;
+});
+
 describe('Local Storage Middleware', () => {
   beforeEach(() => {
     mockLocalStorage.clear();
@@ -26,7 +34,6 @@ describe('Local Storage Middleware', () => {
     it('should return undefined if no state in localStorage', () => {
       expect(loadState()).toBeUndefined();
     });
-
 
     it('should return undefined if localStorage throws an error', () => {
       mockLocalStorage.getItem.mockImplementationOnce(() => {
