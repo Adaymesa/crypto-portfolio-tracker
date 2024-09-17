@@ -1,70 +1,70 @@
-# Getting Started with Create React App
+# Crypto Portfolio Tracker
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This project is a React-based cryptocurrency portfolio tracker that allows users to add, view, and manage their cryptocurrency holdings.
 
-## Available Scripts
+## Features
 
-In the project directory, you can run:
+- Add and edit cryptocurrency holdings
+- View a list of all cryptocurrencies in the user's portfolio
+- Delete holdings
+- Fetch real-time price data from a public API (CoinGecko)
+- Data persistence using local storage
+- Responsive design for various screen sizes
 
-### `npm start`
+## Setup and Running the App
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+1. Clone the repository:
+   ```
+   git clone https://github.com/Adaymesa/crypto-portfolio-tracker-bfin-final.git
+   cd crypto-portfolio-tracker
+   ```
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+2. Install dependencies:
+   ```
+   npm install
+   ```
 
-### `npm test`
+3. Start the development server:
+   ```
+   npm start
+   ```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+4. Open [http://localhost:3000](http://localhost:3000) to view the app in your browser.
 
-### `npm run build`
+## Running Tests
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+To run the test suite:
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+```
+## Implementation Details
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+- React for the UI
+- Redux (with Redux Toolkit) for state management
+- React Router for navigation
+- Axios for API calls
+- Jest and React Testing Library for testing
 
-### `npm run eject`
+## Code Structure
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+- `src/app`: Contains Redux store and slice configurations
+- `src/components`: Reusable React components
+- `src/screens`: Main screen components
+- `src/services`: API and local storage services
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## Additional Enhancements
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+- Real-time price updates using CoinGecko API
+- Responsive design for mobile and desktop views
+- Error handling and user feedback
+- Continuous Integration (CI) pipeline with GitHub Actions
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## Challenges and Solutions
 
-## Learn More
+During development, I encountered a challenge with continuous API calls to the CoinGecko price API when adding new coins. To address this quickly as time was running out, I implemented a state variable to control the requests, limiting unnecessary API calls and improving performance.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## Future Improvements
 
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- Implement user authentication
+- Add more detailed cryptocurrency information and charts
+- Implement portfolio performance tracking over time
+- Optimize API calls to reduce the risk of hitting rate limits
