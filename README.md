@@ -35,8 +35,10 @@ This project is a React-based cryptocurrency portfolio tracker that allows users
 ## Running Tests
 
 To run the test suite:
+   ```
+   npm test
+   ```
 
-```
 ## Implementation Details
 
 - React for the UI
@@ -56,7 +58,6 @@ To run the test suite:
 
 - Real-time price updates using CoinGecko API
 - Responsive design for mobile and desktop views
-- Error handling and user feedback
 - Continuous Integration (CI) pipeline with GitHub Actions
 
 ## Challenges and Solutions
